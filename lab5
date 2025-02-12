@@ -78,16 +78,78 @@ INSERT INTO TEXT VALUES(12006,'EAST ASIA','JK','SINGH');
 
 SELECT course
 FROM BOOK_ADOPTION
-WHERE course IN (
-    SELECT course
-    FROM BOOK_ADOPTION
-    GROUP BY course
-    HAVING COUNT(DISTINCT book_isbn) > 1
+GROUP BY course
+HAVING COUNT(book_isbn) > 1;
+
+
+
+SELECT C.dept
+FROM COURSE C
+WHERE NOT EXISTS (
+    SELECT *
+    FROM BOOK_ADOPTION BA
+    JOIN TEXT T ON BA.book_isbn = T.book_isbn
+    WHERE C.course = BA.course
+    AND T.publisher <> 'PEARSON'
+);
+
+SELECT E.regno
+FROM ENROLL E
+JOIN COURSE C ON E.course = C.course
+GROUP BY E.regno
+HAVING COUNT(DISTINCT C.dept) > 1;
+
+
+SELECT S.regno, S.name
+FROM STUDENT S
+WHERE S.regno NOT IN (SELECT regno FROM ENROLL);
+
+
+SELECT DISTINCT C.dept
+FROM COURSE C
+WHERE NOT EXISTS (
+    SELECT *
+    FROM TEXT T
+    WHERE T.publisher = 'JK'
+    AND NOT EXISTS (
+        SELECT *
+        FROM BOOK_ADOPTION BA
+        WHERE BA.book_isbn = T.book_isbn
+        AND BA.course = C.course
+    )
 );
 
 
-    COURSE
-----------
-       115
-       115
+SELECT book_isbn, booktitle
+FROM TEXT
+WHERE book_isbn IN (
+    SELECT book_isbn FROM BOOK_ADOPTION
+    INTERSECT
+    SELECT book_isbn FROM ENROLL
+);
+
+
+SELECT course
+FROM BOOK_ADOPTION
+WHERE book_isbn IN (
+    SELECT book_isbn FROM TEXT WHERE publisher = 'JK'
+)
+GROUP BY course
+HAVING COUNT(DISTINCT book_isbn) >= 2;
+
+
+SELECT regno
+FROM ENROLL
+GROUP BY regno
+HAVING COUNT(book_isbn) = (
+    SELECT MAX(book_count)
+    FROM (SELECT COUNT(book_isbn) AS book_count FROM ENROLL GROUP BY regno) AS temp
+);
+
+
+
+SELECT publisher, COUNT(book_isbn) AS book_count
+FROM TEXT
+GROUP BY publisher;
+
 
