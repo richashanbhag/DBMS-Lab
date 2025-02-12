@@ -1,0 +1,189 @@
+CREATE TABLE PERSON(
+  driver_id varchar(10),
+ name varchar(10),
+ address varchar(10),
+  PRIMARY KEY (driver_id));
+
+
+CREATE TABLE CAR(
+regno varchar(10),
+model varchar(10),
+Year int,
+PRIMARY KEY (regno));
+
+create table ACCIDENT(
+report_number int,
+accd_date date,
+location varchar(30),
+primary key (report_number));
+
+CREATE TABLE OWNS(
+driver_id varchar(10),
+regno varchar(10),
+FOREIGN KEY (driver_id) REFERENCES PERSON(driver_id),
+FOREIGN KEY (regno) REFERENCES CAR(regno));
+
+CREATE TABLE PARTICIPATED(
+driver_id varchar(10),
+regno varchar (10),
+report_number int,
+damage_amout int,
+PRIMARY KEY (driver_id,regno,report_number),
+FOREIGN KEY (driver_id) REFERENCES PERSON(driver_id),
+FOREIGN KEY (regno) REFERENCES CAR(regno),
+FOREIGN KEY (report_number) REFERENCES ACCIDENT(report_number));
+
+INSERT INTO PERSON VALUES( 101,'ANIL','MUMBAI');
+INSERT INTO PERSON VALUES(102,'RIYA','PUNE');
+INSERT INTO PERSON VALUES(103,'SIYA','THANE');
+INSERT INTO PERSON VALUES(104,'RAHUL','KOCHI');
+INSERT INTO PERSON VALUES(105,'RAVI','MANIPAL');
+
+INSERT INTO CAR VALUES(2301,'AUDI',2013);
+INSERT INTO CAR VALUES(2302,'HYUNDAI',2014);
+INSERT INTO CAR VALUES(2303,'AUDI',2012);
+INSERT INTO CAR VALUES(2304,'MARUTI',2016);
+INSERT INTO CAR VALUES(2305,'MAHINDRA',2018);
+
+INSERT INTO ACCIDENT VALUES(001,to_date('2020-12-20','yyyy-mm-dd'),'MUMBAI');
+INSERT INTO ACCIDENT VALUES(002,to_date('2021-10-20','yyyy-mm-dd'),'PUNE');
+INSERT INTO ACCIDENT VALUES(003,to_date('2024-12-02','yyyy-mm-dd'),'THANE');
+INSERT INTO ACCIDENT VALUES(004,to_date('2020-06-15','yyyy-mm-dd'),'KOCHI');
+INSERT INTO ACCIDENT VALUES(005,to_date('2019-05-24','yyyy-mm-dd'),'MANIPAL');
+
+INSERT INTO OWNS VALUES(101,2301);
+INSERT INTO OWNS VALUES(102,2302);
+INSERT INTO OWNS VALUES(103,2303);
+INSERT INTO OWNS VALUES(104,2304);
+INSERT INTO OWNS VALUES(105,2305);
+
+INSERT INTO PARTICIPATED VALUES(101,2301,001,5000);
+INSERT INTO PARTICIPATED VALUES(102,2302,002,6000);
+INSERT INTO PARTICIPATED VALUES(103,2303,003,7000);
+INSERT INTO PARTICIPATED VALUES(104,2304,004,8000);
+INSERT INTO PARTICIPATED VALUES(105,2305,005,4000);
+
+SQL> select * from person
+  2  ;
+
+DRIVER_ID  NAME       ADDRESS
+---------- ---------- ----------
+101        ANIL       MUMBAI
+102        RIYA       PUNE
+103        SIYA       THANE
+104        RAHUL      KOCHI
+105        RAVI       MANIPAL
+
+SQL> select * from car;
+
+REGNO      MODEL            YEAR
+---------- ---------- ----------
+2301       AUDI             2013
+2302       HYUNDAI          2014
+2303       AUDI             2012
+2304       MARUTI           2016
+2305       MAHINDRA         2018
+
+SQL> select * from accident;
+
+REPORT_NUMBER ACCD_DATE LOCATION
+------------- --------- ------------------------------
+            1 20-DEC-20 MUMBAI
+            2 20-OCT-21 PUNE
+            3 02-DEC-24 THANE
+            4 15-JUN-20 KOCHI
+            5 24-MAY-19 MANIPAL
+
+SQL> select * from owns
+  2  ;
+
+DRIVER_ID  REGNO
+---------- ----------
+101        2301
+102        2302
+103        2303
+104        2304
+105        2305
+
+SQL> select * from participated;
+
+DRIVER_ID  REGNO      REPORT_NUMBER DAMAGE_AMOUT
+---------- ---------- ------------- ------------
+101        2301                   1         5000
+102        2302                   2         6000
+103        2303                   3         7000
+104        2304                   4         8000
+105        2305                   5         4000
+
+
+update participated
+set damage_amout = 25000
+where report_number=005; 
+
+DRIVER_ID  REGNO      REPORT_NUMBER DAMAGE_AMOUT
+---------- ---------- ------------- ------------
+101        2301                   1         5000
+102        2302                   2         6000
+103        2303                   3         7000
+104        2304                   4         8000
+105        2305                   5        25000
+
+SELECT * FROM ACCIDENT;
+
+REPORT_NUMBER ACCD_DATE LOCATION
+------------- --------- ----------
+            1 20-DEC-20 MUMBAI
+            2 20-OCT-21 PUNE
+            3 02-DEC-24 THANE
+            4 15-JUN-20 KOCHI
+            5 24-MAY-19 MANIPAL
+
+
+SQL>  SELECT *  FROM PARTICIPATED WHERE report_number = 1 OR report_number = 4;
+
+DRIVER_ID  REGNO      REPORT_NUMBER DAMAGE_AMOUT
+---------- ---------- ------------- ------------
+101        2301                   1         5000
+104        2304                   4         8000
+
+SQL> DELETE FROM PARTICIPATED WHERE report_number = 1 OR report_number = 4;
+
+2 rows deleted.
+
+SQL> DELETE  FROM ACCIDENT WHERE extract(year from accd_date)=2020;
+
+2 rows deleted.
+
+ SELECT * FROM ACCIDENT;
+
+REPORT_NUMBER ACCD_DATE LOCATION
+------------- --------- ------------------------------
+            2 20-OCT-21 PUNE
+            3 02-DEC-24 THANE
+            5 24-MAY-19 MANIPAL
+
+ALTER TABLE ACCIDENT ADD country varchar(10);
+SQL> SELECT * FROM ACCIDENT;
+
+REPORT_NUMBER ACCD_DATE LOCATION   COUNTRY
+------------- --------- ---------- ----------
+            1 20-DEC-20 MUMBAI
+            2 20-OCT-21 PUNE
+            3 02-DEC-24 THANE
+            4 15-JUN-20 KOCHI
+            5 24-MAY-19 MANIPAL
+
+ALTER TABLE ACCIDENT  DROP COLUMN country;
+
+SQL> SELECT * FROM ACCIDENT;
+
+REPORT_NUMBER ACCD_DATE LOCATION
+------------- --------- ----------
+            1 20-DEC-20 MUMBAI
+            2 20-OCT-21 PUNE
+            3 02-DEC-24 THANE
+            4 15-JUN-20 KOCHI
+            5 24-MAY-19 MANIPAL
+
+ALTER TABLE CAR ADD CONSTRAINT check1 CHECK( year > 2000);
+
