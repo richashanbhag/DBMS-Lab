@@ -1,0 +1,39 @@
+SELECT COUNT(DISTINCT O.driver_id) AS total_owners
+FROM OWNS O
+JOIN PARTICIPATED P ON O.regno = P.regno
+JOIN ACCIDENT A ON P.report_number = A.report_number
+WHERE EXTRACT(YEAR FROM A.accd_date) = 2008;
+
+SELECT C.model, COUNT(DISTINCT P.report_number) AS accident_count
+FROM CAR C
+JOIN PARTICIPATED P ON C.regno = P.regno
+GROUP BY C.model
+WHERE C.model = 'AUDI';
+
+SELECT P.name AS OWNER_NAME, 
+       COUNT(DISTINCT PA.report_number) AS No_of_Accidents, 
+       SUM(PA.damage_amout) AS Total_Damage
+FROM PERSON P
+JOIN OWNS O ON P.driver_id = O.driver_id
+JOIN PARTICIPATED PA ON O.regno = PA.regno
+GROUP BY P.name
+ORDER BY Total_Damage DESC;
+
+
+SELECT P.name AS OWNER_NAME, 
+       EXTRACT(YEAR FROM A.accd_date) AS accident_year,
+       COUNT(PA.report_number) AS accident_count
+FROM PERSON P
+JOIN OWNS O ON P.driver_id = O.driver_id
+JOIN PARTICIPATED PA ON O.regno = PA.regno
+JOIN ACCIDENT A ON PA.report_number = A.report_number
+GROUP BY P.name, EXTRACT(YEAR FROM A.accd_date)
+HAVING COUNT(PA.report_number) > 2;
+
+
+SELECT P.name AS OWNER_NAME
+FROM PERSON P
+LEFT JOIN OWNS O ON P.driver_id = O.driver_id
+LEFT JOIN PARTICIPATED PA ON O.regno = PA.regno
+WHERE PA.report_number IS NULL;
+
